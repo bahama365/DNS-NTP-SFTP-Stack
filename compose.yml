@@ -1,0 +1,38 @@
+version: "3"
+services:
+
+  dns:
+    image: milobahg/dns:latest
+    ports:
+      - "53:53/udp"
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+ 
+  sftp:
+    image: milobahg/sftp:latest
+    ports:
+      - "2222:22"
+    volumes:
+      - sftpdata:/home
+      - sftplogs:/var/sftp_log
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  visualizer:
+    image: dockersamples/visualizer:stable
+    deploy:
+    ports:
+      - "9000:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  sftpdata:
+  sftplogs:
